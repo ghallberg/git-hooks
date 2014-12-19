@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+ARGS.each_with_index do |i,a|
+  puts "Argument #{i}: #{a}"
+end
+

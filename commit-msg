@@ -6,6 +6,8 @@ current_branch = `git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`.split('/').l
 starts_with_digits_re = /^(\d+).*/
 if starts_with_digits_re.match(current_branch)
   issue_nr = starts_with_digits_re.match(current_branch)[1]
+else
+  exit 0
 end
 
 new_message = File.open(commit_msg_path, 'r+') do |file|

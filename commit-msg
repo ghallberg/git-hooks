@@ -1,33 +1,37 @@
 #!/usr/bin/env ruby
 
-commit_msg_file_path = ARGV[0]
+first_line_file_path = ARGV[0]
 current_branch = `git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`.split('/').last.strip
 
 starts_with_digits_re = /^(\d+).*/
 if starts_with_digits_re.match(current_branch)
   issue_nr = starts_with_digits_re.match(current_branch)[1]
 end
-puts "Issue nr: #{issue_nr}"
 
-file = File.open(commit_msg_file_path)
+new_message = File.open(first_line_file_path, 'r+') do |file|
+  first_line = file.readline
+  
+  starts_with_issue_nr = /^#{issue_nr}.*/
+  if starts_with_issue_nr.match(first_line)
+    first_line.sub!(issue_nr, "[#{issue_nr}]")
+  end
 
-commit_msg = file.readline
-puts "Old commit msg: #{commit_msg}"
+  issue_nr_in_brackets = /^\[#{issue_nr}\]/
+  if !issue_nr_in_brackets.match(first_line)
+    first_line = "[#{issue_nr}] #{first_line}"
+  end
 
-issue_nr_in_brackets = /^\[#{issue_nr}\]/
-starts_with_issue_nr = /^#{issue_nr}_/
+  new_message = first_line
 
-if starts_with_issue_nr.match(commit_msg)
-  commit_msg.sub!(issue_nr, "[#{issue_nr}]")
+  file.each_line do |line|
+    new_message << line
+  end
+  new_message
 end
 
-if !issue_nr_in_brackets.match(commit_msg)
-  commit_msg = "[#{issue_nr}] #{commit_msg}"
-end
+File.open(first_line_file_path, 'w') {|file| file.write(new_message)}
 
-puts "New commit msg: #{commit_msg}"
 
-exit 1
 #Start of commit msg
 #If matches branch issue_no, add brackets
 #If issue_no in brackets, leave alone

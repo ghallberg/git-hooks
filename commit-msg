@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-first_line_file_path = ARGV[0]
+commit_msg_path = ARGV[0]
 current_branch = `git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`.split('/').last.strip
 
 starts_with_digits_re = /^(\d+).*/
@@ -8,7 +8,7 @@ if starts_with_digits_re.match(current_branch)
   issue_nr = starts_with_digits_re.match(current_branch)[1]
 end
 
-new_message = File.open(first_line_file_path, 'r+') do |file|
+new_message = File.open(commit_msg_path, 'r+') do |file|
   first_line = file.readline
   
   starts_with_issue_nr = /^#{issue_nr}.*/
@@ -29,7 +29,7 @@ new_message = File.open(first_line_file_path, 'r+') do |file|
   new_message
 end
 
-File.open(first_line_file_path, 'w') {|file| file.write(new_message)}
+File.open(commit_msg_path, 'w') {|file| file.write(new_message)}
 
 
 #Start of commit msg

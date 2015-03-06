@@ -12,15 +12,17 @@ end
 
 new_message = File.open(commit_msg_path, 'r+') do |file|
   first_line = file.readline
-  
-  starts_with_issue_nr = /^#{issue_nr}.*/
-  if starts_with_issue_nr.match(first_line)
-    first_line.sub!(issue_nr, "[#{issue_nr}]")
-  end
 
-  issue_nr_in_brackets = /^\[#{issue_nr}\]/
-  if !issue_nr_in_brackets.match(first_line)
-    first_line = "[#{issue_nr}] #{first_line}"
+  unless first_line.start_with?('#') || first_line == ''
+    starts_with_issue_nr = /^#{issue_nr}.*/
+    if starts_with_issue_nr.match(first_line)
+      first_line.sub!(issue_nr, "[#{issue_nr}]")
+    end
+
+    issue_nr_in_brackets = /^\[#{issue_nr}\]/
+    if !issue_nr_in_brackets.match(first_line)
+      first_line = "[#{issue_nr}] #{first_line}"
+    end
   end
 
   new_message = first_line
